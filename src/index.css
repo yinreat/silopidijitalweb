@@ -1,0 +1,954 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@property --color-primary { syntax: "<color>"; inherits: true; initial-value: #1677FF; }
+@property --color-primary-light { syntax: "<color>"; inherits: true; initial-value: #50A0FF; }
+@property --color-primary-dark { syntax: "<color>"; inherits: true; initial-value: #115BC2; }
+@property --color-primary-soft { syntax: "<color>"; inherits: true; initial-value: #F0F6FF; }
+@property --color-primary-tint { syntax: "<color>"; inherits: true; initial-value: #DCEAFF; }
+@property --color-primary-border { syntax: "<color>"; inherits: true; initial-value: #A5CCFF; }
+@property --color-primary-muted { syntax: "<color>"; inherits: true; initial-value: #73B0FF; }
+@property --color-primary-ink { syntax: "<color>"; inherits: true; initial-value: #0B3D80; }
+@property --color-on-primary { syntax: "<color>"; inherits: true; initial-value: #FFFFFF; }
+
+@layer base {
+  :root {
+    --color-primary: #1677FF;
+    --color-primary-light: #50A0FF;
+    --color-primary-dark: #115BC2;
+    --color-primary-soft: #F0F6FF;
+    --color-primary-tint: #DCEAFF;
+    --color-primary-border: #A5CCFF;
+    --color-primary-muted: #73B0FF;
+    --color-primary-ink: #0B3D80;
+    --color-on-primary: #FFFFFF;
+  }
+
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    @apply bg-slate-100 text-slate-800 antialiased;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+
+  /* Scrollbar styling */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-slate-200;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-slate-400 rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-slate-500;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg font-medium transition-all duration-150 active:scale-95 disabled:opacity-50 disabled:pointer-events-none;
+  }
+
+  .btn-primary {
+    @apply btn text-white shadow-sm;
+    background-color: var(--color-primary);
+  }
+
+  .btn-secondary {
+    @apply btn bg-white text-slate-700 hover:bg-slate-100 border border-slate-300 shadow-sm;
+  }
+
+  .btn-danger {
+    @apply btn bg-red-500 text-white hover:bg-red-600 shadow-sm;
+  }
+
+  .btn-success {
+    @apply btn text-white shadow-sm;
+    background-color: var(--color-primary);
+  }
+
+  .input {
+    @apply w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-800 placeholder-slate-400 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 focus:outline-none transition-all;
+  }
+
+  .card {
+    @apply bg-white rounded-xl shadow-sm border border-slate-200;
+  }
+
+  .label {
+    @apply block text-sm font-medium text-slate-700 mb-1;
+  }
+
+  /* Desktop/Electron form reliability: never allow an ancestor utility or
+     compositor quirk to disable hit-testing or text selection on controls. */
+  input, textarea, select {
+    pointer-events: auto !important;
+    -webkit-user-select: text !important;
+    user-select: text !important;
+  }
+
+  .propos-modal-overlay {
+    pointer-events: auto;
+  }
+
+  .propos-modal-content {
+    pointer-events: auto;
+    -webkit-user-select: text;
+    user-select: text;
+  }
+}
+
+/* Printing is scoped per feature. Never hide the entire app for unrelated print dialogs. */
+
+/* Smooth color interpolation when RGB theme changes */
+:root { transition: --color-primary 900ms ease-in-out, --color-primary-light 900ms ease-in-out, --color-primary-dark 900ms ease-in-out, --color-primary-soft 900ms ease-in-out, --color-primary-tint 900ms ease-in-out, --color-primary-border 900ms ease-in-out, --color-primary-muted 900ms ease-in-out, --color-primary-ink 900ms ease-in-out, --color-on-primary 900ms ease-in-out; }
+.btn-primary, .btn-success, .bg-teal-600, .bg-teal-700, .text-teal-600, .text-teal-700, .border-teal-200, .border-teal-300 {
+  transition: background-color 900ms ease-in-out, color 900ms ease-in-out, border-color 900ms ease-in-out, box-shadow 900ms ease-in-out;
+}
+
+@page labels-a4 { size: A4 portrait; margin: 4mm 4.6mm; }
+@page poster-a4 { size: A4 portrait; margin: 5mm; }
+@page reports-a4 { size: A4 portrait; margin: 7mm; }
+@page cash-report-page { size: 80mm auto; margin: 2mm; }
+@page receipt-page { size: 80mm auto; margin: 2mm; }
+@page receipt-page-58 { size: 58mm auto; margin: 1.5mm; }
+@page receipt-page-80 { size: 80mm auto; margin: 2mm; }
+
+.barcode-print-root { display: none; }
+
+@media print {
+  /* Print target is portaled to body; hide the app shell rather than relying
+     on visibility overrides inside the app's overflow-hidden containers. */
+  body.label-printer-printing { margin: 0 !important; padding: 0 !important; background: #fff !important; }
+  body.label-printer-printing > *:not(#print-area) { display: none !important; }
+  body.label-printer-printing #print-area,
+  body.label-printer-printing #print-area * { visibility: visible !important; }
+  body.label-printer-printing #print-area {
+    page: labels-a4;
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 200.8mm !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: grid !important;
+    box-sizing: border-box !important;
+    background: #fff !important;
+  }
+  body.printing-poster * { visibility: hidden !important; }
+  body.printing-poster #poster-print-area,
+  body.printing-poster #poster-print-area * { visibility: visible !important; }
+  body.printing-poster #poster-print-area {
+    page: poster-a4;
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 200mm !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #fff !important;
+  }
+  body.printing-cash-report * { visibility: hidden !important; }
+  body.printing-cash-report .cash-report-print-area,
+  body.printing-cash-report .cash-report-print-area * { visibility: visible !important; }
+  body.printing-cash-report .cash-report-print-area {
+    page: cash-report-page;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 76mm !important;
+    max-width: 76mm !important;
+    margin: 0 !important;
+    padding: 3mm !important;
+    display: block !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    overflow: visible !important;
+    background: #fff !important;
+    color: #000 !important;
+    box-sizing: border-box !important;
+  }
+  body.printing-cash-report .cash-report-no-print { display: none !important; }
+  body.printing-receipt * { visibility: hidden !important; }
+  body.printing-receipt .receipt-print-area,
+  body.printing-receipt .receipt-print-area * { visibility: visible !important; }
+  body.printing-receipt .receipt-print-area {
+    page: receipt-page;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 76mm !important;
+    max-width: 76mm !important;
+    margin: 0 !important;
+    padding: 4mm !important;
+    transform: none !important;
+    animation: none !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    overflow: visible !important;
+    background: #fff !important;
+    color: #000 !important;
+    box-sizing: border-box !important;
+  }
+  body.printing-receipt.receipt-paper-58 .receipt-print-area { page: receipt-page-58; width: 54mm !important; max-width: 54mm !important; padding: 2mm !important; }
+  body.printing-receipt.receipt-paper-80 .receipt-print-area { page: receipt-page-80; width: 76mm !important; max-width: 76mm !important; padding: 4mm !important; }
+  body.printing-receipt .receipt-no-print { display: none !important; }
+  /* Keep the overlay in the print tree: the receipt itself is nested inside it. */
+  body.printing-receipt .receipt-modal-overlay {
+    display: block !important; position: static !important; inset: auto !important;
+    width: auto !important; height: auto !important; padding: 0 !important;
+    overflow: visible !important; background: transparent !important; z-index: auto !important;
+  }
+  body.printing-receipt .receipt-print-area * { color: #000 !important; }
+  body.printing-reports * { visibility: hidden !important; }
+  body.printing-reports .reports-print-root,
+  body.printing-reports .reports-print-root * { visibility: visible !important; }
+  body.printing-reports .reports-print-root {
+    page: reports-a4;
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+    background: #fff !important;
+    color: #111 !important;
+  }
+  body.printing-reports .reports-print-root main {
+    display: block !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+  body.printing-reports .reports-print-root canvas,
+  body.printing-reports .reports-print-root svg { max-width: 100% !important; }
+  .reports-print-root { page: reports-a4; }
+  .poster-print-area { page: poster-a4; }
+}
+
+@layer utilities {
+  .mobile-touch {
+    touch-action: manipulation;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+}
+
+@media (max-width: 767px) {
+  html,
+  body,
+  #root {
+    min-height: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  input,
+  select,
+  textarea,
+  button {
+    font-size: 16px;
+  }
+
+  .mobile-app-shell .input {
+    min-height: 46px;
+  }
+
+  .mobile-embedded > .h-screen {
+    height: 100% !important;
+  }
+
+  .mobile-embedded > .h-screen > * {
+    min-width: 0;
+  }
+}
+
+/* ProPOS Customer Edition - generic tenant-branded campaign posters */
+.poster-print-area {
+  --poster-gap: 5mm;
+  width: 100%;
+  max-width: 210mm;
+  margin: 0 auto;
+  display: grid;
+  gap: var(--poster-gap);
+  align-content: start;
+}
+.poster-layout-single { grid-template-columns: 1fr; }
+.poster-layout-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.poster-layout-4 { grid-template-columns: repeat(2, 1fr); }
+.poster-layout-6 { grid-template-columns: repeat(2, 1fr); }
+.poster-card { min-width: 0; }
+.poster-border {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 0.707 / 1;
+  background: #fff;
+  border: 2mm solid #101B32;
+  border-radius: 3mm;
+  padding: 4.5%;
+  display: flex;
+  flex-direction: column;
+  color: #111;
+  box-sizing: border-box;
+}
+.poster-layout-2 .poster-border { aspect-ratio: 0.34 / 1; padding: 4%; }
+.poster-layout-4 .poster-border { aspect-ratio: 0.76 / 1; padding: 4%; }
+.poster-layout-6 .poster-border { aspect-ratio: 0.78 / 1; padding: 3.5%; }
+.poster-top {
+  height: 13%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1.5mm solid #101B32;
+  position: relative;
+  margin-bottom: 3%;
+}
+.poster-top::before,
+.poster-top::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 22%;
+  height: 2px;
+  background: #101B32;
+  transform: translateY(-50%);
+}
+.poster-top::before { left: 0; }
+.poster-top::after { right: 0; }
+.poster-brand {
+  position: relative;
+  z-index: 1;
+  max-width: 66%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding: 1% 4%;
+  background: #fff;
+  color: #101B32;
+  font-size: clamp(10px, 2.25vw, 23px);
+  font-weight: 900;
+  line-height: 1.1;
+  text-align: center;
+}
+.poster-title {
+  position: relative;
+  margin: 0 3% 3%;
+  min-height: 12%;
+  padding: 2.5% 4%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  background: #101B32;
+  border: 0;
+  border-radius: 2mm;
+  transform: none;
+}
+.poster-title::before,
+.poster-title::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: .65em;
+  font-weight: 1000;
+}
+.poster-title::before { left: 2%; }
+.poster-title::after { right: 2%; }
+.poster-mode-color .poster-title { color: #fff; background: #176BDE; border-color: #176BDE; }
+.poster-mode-color .poster-title::before,
+.poster-mode-color .poster-title::after { color: #fff; }
+.poster-title span {
+  font-size: clamp(18px, 4.5vw, 44px);
+  font-weight: 1000;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+}
+.poster-product {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2%;
+}
+.poster-layout-2 .poster-product { flex-direction: column; justify-content: center; gap: 2%; }
+.poster-name-wrap { width: 100%; text-align: center; }
+.poster-layout-2 .poster-name-wrap { width: 100%; text-align: center; }
+.poster-name-wrap h2 {
+  margin: 0;
+  font-size: clamp(20px, 5vw, 48px);
+  line-height: .98;
+  font-weight: 1000;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+.poster-name-wrap p {
+  margin-top: 1.5%;
+  font-size: clamp(7px, 1.2vw, 12px);
+  font-weight: 800;
+  letter-spacing: .04em;
+}
+.poster-image-box {
+  width: 58%;
+  height: 43%;
+  min-height: 30mm;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.poster-layout-2 .poster-image-box { width: 82%; height: 58%; min-height: 0; overflow: hidden; }
+.poster-image-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transform-origin: center;
+  will-change: transform;
+}
+.poster-mode-bw .poster-image-box img { filter: grayscale(1) contrast(1.35) brightness(.96); }
+.poster-placeholder {
+  width: 75%;
+  height: 90%;
+  border: 2px dashed #555;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #444;
+  gap: 5px;
+  font-size: 10px;
+  font-weight: 900;
+}
+.poster-prices {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5%;
+  min-height: 21%;
+  margin-top: 1%;
+}
+.poster-old {
+  position: relative;
+  font-weight: 1000;
+  font-size: clamp(18px, 4vw, 40px);
+  line-height: 1;
+  white-space: nowrap;
+}
+.poster-old i {
+  position: absolute;
+  left: -6%; right: -6%; top: 48%;
+  border-top: 5px solid #111;
+  transform: rotate(-7deg);
+}
+.poster-old small { font-size: .45em; }
+.poster-new {
+  background: #F1F5F9;
+  color: #101B32;
+  border: 2mm solid #101B32;
+  padding: 2% 5%;
+  line-height: .9;
+  display: flex;
+  align-items: flex-end;
+  border-radius: 1mm;
+}
+.poster-mode-color .poster-new { color: #176BDE; border-color: #176BDE; background: #EFF6FF; }
+.poster-new strong { font-size: clamp(38px, 9vw, 80px); font-weight: 1000; }
+.poster-new span { font-size: clamp(12px, 2vw, 24px); font-weight: 1000; margin-bottom: 5px; }
+.poster-discount {
+  position: absolute;
+  right: 1%;
+  bottom: 4%;
+  width: 19%;
+  aspect-ratio: 1;
+  border: 2mm solid #101B32;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: clamp(12px, 2.4vw, 25px);
+  line-height: .85;
+  font-weight: 1000;
+  transform: rotate(4deg);
+  background: #fff;
+}
+.poster-mode-color .poster-discount { border-color: #176BDE; color: #176BDE; }
+.poster-discount b { font-size: .45em; }
+.poster-note { text-align: center; font-size: clamp(8px, 1.4vw, 13px); font-weight: 900; margin: 1% 0; }
+.poster-bottom {
+  margin-top: 2%;
+  border-top: 1.5mm solid #101B32;
+  color: #101B32;
+  text-align: center;
+  padding: 2.5% 2% 0;
+  font-size: clamp(11px, 2.6vw, 28px);
+  font-weight: 1000;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+.poster-mode-color .poster-bottom { border-color: #176BDE; color: #176BDE; }
+
+@media print {
+  body.printing-poster, body.printing-poster #root { width: 210mm; min-height: 297mm; background: #fff !important; }
+  .poster-layout-single { grid-template-columns: 1fr !important; }
+  .poster-layout-2 { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+  .poster-layout-4 { grid-template-columns: repeat(2, 1fr) !important; }
+  .poster-layout-6 { grid-template-columns: repeat(2, 1fr) !important; }
+  .poster-layout-single .poster-border { height: 287mm; aspect-ratio: auto; }
+  .poster-layout-2 .poster-border { height: 287mm; aspect-ratio: auto; }
+  .poster-layout-4 .poster-border { height: 140mm; aspect-ratio: auto; }
+  .poster-layout-6 .poster-border { height: 92mm; aspect-ratio: auto; }
+  .poster-card { break-inside: avoid; page-break-inside: avoid; }
+  .poster-print-area { gap: 4mm !important; }
+  .poster-image-box img { max-height: 100%; }
+  .poster-title span { font-size: 28pt; }
+  .poster-name-wrap h2 { font-size: 25pt; }
+  .poster-new strong { font-size: 46pt; }
+  .poster-old { font-size: 25pt; }
+}
+
+
+
+/* Silopi Dijital theme: brand accents are blue/white on a near-black base.
+   Unlayered selectors deliberately override hard-coded older teal/emerald utilities. */
+.btn-primary, .btn-success, .bg-teal-600, .bg-teal-700,
+.bg-emerald-500, .bg-emerald-600, .bg-blue-600 {
+  background-color: var(--color-primary) !important;
+}
+.btn-primary, .btn-success, .bg-teal-600.text-white, .bg-teal-700.text-white,
+.bg-emerald-500.text-white, .bg-emerald-600.text-white, .bg-blue-600.text-white {
+  color: var(--color-on-primary) !important;
+}
+.btn-primary:hover, .btn-success:hover, .hover\:bg-teal-700:hover,
+.hover\:bg-teal-800:hover, .hover\:bg-emerald-400:hover {
+  background-color: var(--color-primary-dark) !important;
+}
+.bg-teal-50, .bg-blue-50, .bg-emerald-50 { background-color: var(--color-primary-soft) !important; }
+.bg-teal-100, .bg-emerald-100 { background-color: var(--color-primary-tint) !important; }
+.bg-teal-400, .bg-teal-500 { background-color: var(--color-primary-light) !important; }
+.hover\:bg-teal-50:hover, .hover\:bg-teal-100:hover, .hover\:bg-emerald-50:hover { background-color: var(--color-primary-soft) !important; }
+.text-teal-500, .text-teal-600, .text-teal-700,
+.text-emerald-600, .text-emerald-700, .text-emerald-800,
+.text-blue-600, .text-blue-700, .text-blue-800 { color: var(--color-primary-ink) !important; }
+.text-teal-400, .text-emerald-400, .text-blue-300 { color: var(--color-primary-light) !important; }
+.border-teal-100, .border-teal-200, .border-teal-300, .border-emerald-100, .border-emerald-200, .border-blue-200 {
+  border-color: var(--color-primary-border) !important;
+}
+.border-teal-400, .border-teal-600, .border-emerald-500, .border-blue-500 { border-color: var(--color-primary) !important; }
+.border-t-teal-400 { border-top-color: var(--color-primary-light) !important; }
+.hover\:border-teal-400:hover { border-color: var(--color-primary) !important; }
+.hover\:text-teal-600:hover, .hover\:text-blue-500:hover { color: var(--color-primary-ink) !important; }
+.ring-teal-100, .focus\:ring-teal-100:focus { --tw-ring-color: var(--color-primary-border) !important; }
+.focus\:border-teal-500:focus, .input:focus { border-color: var(--color-primary) !important; }
+.focus\:ring-teal-200:focus, .input:focus { --tw-ring-color: var(--color-primary-border) !important; }
+.to-teal-900 { --tw-gradient-to: var(--color-primary-dark) var(--tw-gradient-to-position) !important; }
+
+.theme-range {
+  display: block;
+  width: 100%;
+  height: 10px;
+  border-radius: 999px;
+  appearance: none;
+  outline: none;
+  cursor: pointer;
+  accent-color: var(--color-primary);
+}
+.theme-range::-webkit-slider-thumb {
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border: 3px solid #fff;
+  border-radius: 50%;
+  background: var(--color-primary);
+  box-shadow: 0 0 0 1px rgba(15, 23, 42, .25);
+}
+.theme-range::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border: 3px solid #fff;
+  border-radius: 50%;
+  background: var(--color-primary);
+  box-shadow: 0 0 0 1px rgba(15, 23, 42, .25);
+}
+.hue-range { background: linear-gradient(to right, #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000); }
+
+/* Direct thermal-label mode: one precisely sized label per print page. */
+@page label-economic { size: 64.5mm 32mm; margin: 0; }
+@page label-compact { size: 80mm 30mm; margin: 0; }
+@page label-standard { size: 100mm 38mm; margin: 0; }
+@page label-large { size: 100mm 50mm; margin: 0; }
+@media print {
+  body.label-printer-printing #print-area {
+    display: block !important;
+    visibility: visible !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+    box-sizing: border-box !important;
+  }
+  body.label-printer-printing #print-area.print-direct-economic { page: label-economic; width: 64.5mm !important; }
+  body.label-printer-printing #print-area.print-direct-compact { page: label-compact; width: 80mm !important; }
+  body.label-printer-printing #print-area.print-direct-standard { page: label-standard; width: 100mm !important; }
+  body.label-printer-printing #print-area.print-direct-large { page: label-large; width: 100mm !important; }
+  body.label-printer-printing #print-area .label-roll-list { display: flex !important; flex-direction: column !important; gap: 0 !important; margin: 0 !important; padding: 0 !important; }
+  body.label-printer-printing #print-area .label-roll-item { display: block !important; margin: 0 !important; padding: 0 !important; box-sizing: border-box !important; break-inside: avoid !important; page-break-inside: avoid !important; }
+  body.label-printer-printing #print-area .label-roll-item > div { width: 100% !important; height: 100% !important; margin: 0 !important; }
+  body.label-printer-printing #print-area .label-roll-item svg { max-width: 100%; }
+}
+
+/* Refined campaign posters: crisp Silopi Dijital-inspired navy/blue, printer friendly. */
+.poster-title::before, .poster-title::after { display: none; }
+.poster-mode-bw .poster-title { color: #fff; background: #101B32; }
+.poster-mode-color .poster-title { color: #fff; background: #176BDE; }
+.poster-mode-bw .poster-title { color: #fff; background: #101B32; }
+.poster-mode-bw .poster-new { background: #F1F5F9; color: #101B32; }
+.poster-mode-bw .poster-discount { background: #fff; color: #101B32; }
+.poster-note { color: #334155; letter-spacing: .02em; }
+.poster-bottom { letter-spacing: .08em; }
+
+
+/* Receipt and other print pages are scoped by body classes above. */
+
+/* -------------------------------------------------------------------------
+   Silopi Dijital - ProPOS customer visual system + offline POS
+   The existing page logic is intentionally untouched: this layer harmonizes
+   the dashboard, checkout, catalog, customer accounts, cash, reports and forms.
+   ------------------------------------------------------------------------- */
+:root {
+  --app-page-bg: #f3f6fb;
+  --app-card-bg: #ffffff;
+  --app-border: #e3eaf4;
+  --app-ink: #17243b;
+  --app-muted: #71809a;
+  --app-shadow: 0 3px 12px rgba(16, 36, 72, .045), 0 1px 2px rgba(16, 36, 72, .035);
+  --app-shadow-hover: 0 12px 28px rgba(24, 51, 91, .09), 0 3px 8px rgba(24, 51, 91, .045);
+  --app-radius: 18px;
+}
+
+html, body, #root { min-width: 320px; }
+body { background: var(--app-page-bg); color: var(--app-ink); }
+
+.pc-app-shell { background: var(--app-page-bg) !important; }
+.pc-sidebar {
+  position: relative;
+  z-index: 20;
+  flex: 0 0 252px;
+  width: 252px !important;
+  background: linear-gradient(180deg, #17253b 0%, #1c2b43 46%, #17243a 100%) !important;
+  border-right: 1px solid rgba(255,255,255,.055);
+  box-shadow: 6px 0 24px rgba(15, 31, 55, .035);
+}
+.sidebar-brand { padding: 21px 18px 17px !important; border-color: rgba(255,255,255,.09) !important; }
+.sidebar-brand img { max-height: 44px; filter: drop-shadow(0 2px 5px rgba(0,0,0,.12)); }
+.sidebar-brand p { margin-top: 14px !important; letter-spacing: .025em; }
+.app-sidebar-nav { padding: 14px 12px !important; scrollbar-color: rgba(148,163,184,.3) transparent; }
+.app-nav-group { margin-bottom: 4px; }
+.app-nav-item { border: 1px solid transparent; border-radius: 12px !important; }
+.app-nav-link { min-height: 44px; padding: 11px 12px !important; gap: 11px !important; letter-spacing: -.01em; }
+.app-nav-item:not(.is-active):hover { background: rgba(255,255,255,.075) !important; }
+.app-nav-item.is-active {
+  background: linear-gradient(110deg, var(--color-primary) 0%, var(--color-primary-dark) 100%) !important;
+  box-shadow: 0 5px 14px rgba(22,119,255,.22), inset 0 1px rgba(255,255,255,.16) !important;
+  border-color: rgba(255,255,255,.10);
+}
+.app-nav-child { min-height: 36px; border-radius: 9px !important; padding: 9px 10px !important; }
+.app-nav-child.is-active { background: rgba(75, 145, 255, .17) !important; color: #dbeafe !important; box-shadow: inset 2px 0 #60a5fa; }
+.pc-sidebar > .border-t { border-color: rgba(255,255,255,.09) !important; padding: 12px !important; }
+.pc-sidebar > .border-t > div { background: rgba(255,255,255,.085) !important; border: 1px solid rgba(255,255,255,.055); border-radius: 12px !important; padding: 12px !important; }
+.pc-sidebar > .border-t button { min-height: 38px; border: 1px solid rgba(255,255,255,.05); border-radius: 10px !important; background: rgba(255,255,255,.085) !important; }
+
+.app-main { min-width: 0; background: var(--app-page-bg); }
+.app-main > div {
+  height: 100% !important;
+  max-height: 100%;
+  min-width: 0;
+  background-color: var(--app-page-bg) !important;
+  color: var(--app-ink);
+}
+.app-main h1 { color: #17243b; font-size: 1.28rem; line-height: 1.35; font-weight: 800; letter-spacing: -.035em; }
+.app-main h2 { letter-spacing: -.02em; }
+.app-main p { text-wrap: pretty; }
+.app-main > div > div[class~="border-b"][class~="bg-white"],
+.app-main > div > header {
+  flex: 0 0 auto;
+  position: relative;
+  z-index: 3;
+  padding: 19px 25px !important;
+  background: rgba(255,255,255,.97) !important;
+  border-color: var(--app-border) !important;
+  box-shadow: 0 1px 0 rgba(25, 49, 80, .015), 0 4px 14px rgba(27, 48, 76, .025);
+}
+.app-main > div > div[class~="border-b"][class~="bg-white"] h1,
+.app-main > div > header h1 { font-size: 1.3rem; }
+.app-main > div > div[class~="border-b"][class~="bg-white"] p,
+.app-main > div > header p { color: #75839b; line-height: 1.5; margin-top: 3px; }
+.app-main > div > div[class~="flex-1"][class~="overflow-y-auto"] {
+  min-height: 0;
+  background: var(--app-page-bg) !important;
+  padding: 23px !important;
+  scrollbar-gutter: stable;
+}
+.app-main .flex-1.overflow-y-auto > .mx-auto { width: 100%; }
+
+/* Panels and data cards share a consistent polished surface language. */
+.app-main .card,
+.app-main section[class*="rounded-2xl"][class*="border"],
+.app-main section[class*="rounded-3xl"][class*="border"] {
+  border-color: var(--app-border) !important;
+  border-radius: var(--app-radius) !important;
+  box-shadow: var(--app-shadow);
+  background-color: var(--app-card-bg);
+}
+.app-main .card { overflow-wrap: anywhere; }
+.app-main .card:hover { border-color: #d7e2f0; }
+.app-main button.card { cursor: pointer; box-shadow: 0 2px 7px rgba(16,36,72,.035); transition: border-color .16s ease, box-shadow .16s ease, transform .16s ease; }
+.app-main button.card:hover { border-color: #a8c9fa !important; box-shadow: var(--app-shadow-hover); transform: translateY(-1px); }
+.app-main section.card > div.border-b,
+.app-main .card > div.border-b { border-color: #e9eef6 !important; }
+.app-main section[class*="rounded-3xl"][class*="border"] > div.border-b { border-color: #e9eef6 !important; }
+.app-main .bg-slate-50 { color: #34445e; }
+.app-main .text-slate-400 { color: #8492a8 !important; }
+.app-main .text-slate-500 { color: #71809a !important; }
+.app-main .text-slate-600 { color: #52617a !important; }
+.app-main .text-slate-700 { color: #34445e !important; }
+.app-main .text-slate-800 { color: #1e2c43 !important; }
+.app-main .border-slate-100, .app-main .border-slate-200 { border-color: var(--app-border) !important; }
+.app-main .divide-slate-100 > :not([hidden]) ~ :not([hidden]) { border-color: #edf1f7 !important; }
+
+/* Consistent controls: clear focus, steadier sizing, friendlier touch targets. */
+.app-main .btn,
+.app-main button.btn-primary,
+.app-main button.btn-secondary,
+.app-main button.btn-danger,
+.app-main button.btn-success {
+  min-height: 38px;
+  border-radius: 11px;
+  font-weight: 700;
+  letter-spacing: -.01em;
+  transition: background-color .15s ease, border-color .15s ease, box-shadow .15s ease, transform .15s ease;
+}
+.app-main .btn-primary, .app-main .btn-success {
+  box-shadow: 0 4px 10px rgba(22,119,255,.14);
+}
+.app-main .btn-primary:hover, .app-main .btn-success:hover { box-shadow: 0 7px 15px rgba(22,119,255,.2); }
+.app-main .btn-secondary { background: #fff !important; border-color: #dce5f0 !important; color: #43536d !important; }
+.app-main .btn-secondary:hover { background: #f6f9fd !important; border-color: #cbd8e8 !important; }
+.app-main input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+.app-main select, .app-main textarea, .app-main .input {
+  border-color: #dbe4f0;
+  border-radius: 11px;
+  background-color: #fff;
+  box-shadow: inset 0 1px 1px rgba(19,37,64,.015);
+}
+.app-main input:focus, .app-main select:focus, .app-main textarea:focus, .app-main .input:focus {
+  border-color: var(--color-primary) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 14%, transparent) !important;
+  outline: none;
+}
+.app-main input[type="checkbox"], .app-main input[type="radio"] { accent-color: var(--color-primary); }
+.app-main button:focus-visible { outline: 3px solid color-mix(in srgb, var(--color-primary) 45%, white); outline-offset: 2px; }
+
+/* Tables are easier to scan while preserving each page's existing columns. */
+.app-main table { border-collapse: separate; border-spacing: 0; color: #33445d; }
+.app-main table thead th { background: #f6f8fc; color: #697991; font-size: 11px; font-weight: 800; letter-spacing: .035em; text-transform: uppercase; border-bottom: 1px solid #e5ebf4; }
+.app-main table tbody tr { transition: background-color .12s ease; }
+.app-main table tbody tr:hover { background-color: #f7faff; }
+.app-main table tbody td { border-color: #edf1f7; }
+.app-main table tbody tr:last-child td { border-bottom: 0; }
+.app-main table td, .app-main table th { vertical-align: middle; }
+.app-main .overflow-x-auto { scrollbar-width: thin; }
+
+/* Checkout: distinct product workspace and a fixed-feeling cart panel. */
+.app-page-pos > div.flex.h-screen { background: var(--app-page-bg) !important; }
+.app-page-pos > div.flex.h-screen > div.flex-1.flex-col { min-width: 0; }
+.app-page-pos > div.flex.h-screen > div.flex-1.flex-col > div.border-b.bg-white,
+.app-page-pos > div.flex.h-screen > div.flex-1.flex-col > div.border-t { border-color: var(--app-border) !important; }
+.app-page-pos > div.flex.h-screen > div.flex-1.flex-col > div.flex-1.overflow-y-auto { background: #f3f6fb !important; padding: 17px !important; }
+.app-page-pos > div.flex.h-screen > div.w-96.flex-col { flex: 0 0 390px; width: 390px !important; max-width: 42%; border-color: var(--app-border) !important; box-shadow: -8px 0 24px rgba(19,37,64,.035); }
+.app-page-pos > div.flex.h-screen > div.w-96.flex-col > div:first-child { padding: 17px 17px 14px !important; border-color: var(--app-border) !important; }
+.app-page-pos button.card { min-height: 118px; border-radius: 15px !important; padding: 13px !important; background: #fff; }
+.app-page-pos button.card h3 { color: #33445d; line-height: 1.4; }
+.app-page-pos button.card p.text-lg { color: var(--color-primary-ink) !important; font-size: 1.15rem; }
+.app-page-pos .animate-fade-in { border-radius: 12px !important; border-color: #e4ebf4 !important; background: #fbfcfe; }
+.app-page-pos .btn-success { min-height: 52px; border-radius: 14px !important; }
+
+/* Dashboard, reports and profit pages — visually layered instead of crowded. */
+.app-page-dashboard .card, .app-page-profit .card, .app-page-reports .card,
+.app-page-cash .card, .app-page-customers .card, .app-page-audit .card,
+.app-page-staff .card, .app-page-consumption .card, .app-page-pricing .card,
+.app-page-settings .card, .app-page-products .card, .app-page-returns .card {
+  box-shadow: var(--app-shadow);
+}
+.app-page-dashboard .grid > .card, .app-page-profit .grid > .card { min-width: 0; }
+.app-page-dashboard .grid > .card p.text-2xl, .app-page-dashboard .grid > .card p.text-xl { letter-spacing: -.035em; }
+.app-page-reports [role="tablist"], .app-page-reports .flex.gap-1.rounded-lg { background: #eaf0f8; border-radius: 12px; padding: 4px; }
+.app-page-reports [role="tab"], .app-page-reports button[aria-selected] { border-radius: 9px; }
+
+/* Metric tiles: prevent long currency strings from clipping at smaller widths. */
+.app-main .grid > div[class*="rounded-xl"][class*="border"],
+.app-main .grid > div[class*="rounded-2xl"][class*="border"] { min-width: 0; }
+.app-main .tabular-nums { font-variant-numeric: tabular-nums; }
+.app-main .break-words { overflow-wrap: anywhere; }
+
+/* Modal surfaces. Keep interactions and existing modal stacking unchanged. */
+.app-main .propos-modal-content,
+.app-main .propos-modal-overlay .card,
+.app-main div.fixed.inset-0 > div[class*="rounded-3xl"] {
+  border: 1px solid #e3eaf4;
+  border-radius: 20px !important;
+  box-shadow: 0 24px 80px rgba(12, 28, 52, .2) !important;
+}
+
+/* Narrow windows / tablets: collapse the checkout cart and keep all controls usable. */
+@media (max-width: 1120px) {
+  .pc-sidebar { flex-basis: 224px; width: 224px !important; }
+  .app-page-pos > div.flex.h-screen > div.w-96.flex-col { flex-basis: 340px; width: 340px !important; max-width: 45%; }
+  .app-main > div > div[class~="flex-1"][class~="overflow-y-auto"] { padding: 18px !important; }
+}
+@media (max-width: 820px) {
+  .pc-app-shell { flex-direction: column; }
+  .pc-sidebar { flex: 0 0 auto; width: 100% !important; max-height: 46vh; }
+  .sidebar-brand { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 14px !important; }
+  .sidebar-brand > div { min-height: 36px !important; justify-content: flex-start !important; }
+  .sidebar-brand img { max-height: 32px; }
+  .sidebar-brand p { margin: 0 !important; white-space: nowrap; }
+  .app-sidebar-nav { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 4px; padding: 8px !important; }
+  .app-nav-group { margin: 0; min-width: 0; }
+  .app-nav-link { min-height: 38px; padding: 8px !important; font-size: 12px !important; }
+  .app-nav-child { font-size: 11px !important; }
+  .pc-sidebar > .border-t { display: none; }
+  .app-main { min-height: 0; }
+  .app-main > div > div[class~="border-b"][class~="bg-white"], .app-main > div > header { padding: 15px 16px !important; }
+  .app-main > div > div[class~="flex-1"][class~="overflow-y-auto"] { padding: 14px !important; }
+  .app-page-pos > div.flex.h-screen { flex-direction: column; }
+  .app-page-pos > div.flex.h-screen > div.w-96.flex-col { flex: 0 0 45%; width: 100% !important; max-width: 100%; border-left: 0; border-top: 1px solid var(--app-border); }
+  .app-page-pos > div.flex.h-screen > div.flex-1.flex-col { flex: 1 1 55%; min-height: 0; }
+}
+@media (max-width: 520px) {
+  .pc-sidebar { max-height: 42vh; }
+  .app-sidebar-nav { grid-template-columns: repeat(2, minmax(0,1fr)); }
+  .app-nav-link { gap: 7px !important; font-size: 11px !important; }
+  .app-nav-link svg { width: 16px; height: 16px; }
+  .app-main h1 { font-size: 1.1rem; }
+  .app-main .card { border-radius: 14px !important; }
+  .app-page-pos button.card { min-height: 96px; }
+}
+
+@media print {
+  .pc-sidebar { display: none !important; }
+  .app-main, .app-main > div { background: #fff !important; box-shadow: none !important; }
+  .app-main .card, .app-main section[class*="rounded-2xl"][class*="border"], .app-main section[class*="rounded-3xl"][class*="border"] { box-shadow: none !important; }
+}
+
+
+/* 5.4.11 — consistent premium visual language across every workspace. */
+:root {
+  --app-page-bg: #f3f6fb;
+  --app-border: #e3eaf4;
+  --app-shadow: 0 5px 20px rgba(15, 34, 60, .045), 0 1px 3px rgba(15, 34, 60, .035);
+}
+body { background: var(--app-page-bg); }
+.pc-sidebar {
+  background: linear-gradient(180deg, #101d32 0%, #19283e 58%, #15243a 100%) !important;
+  box-shadow: 10px 0 28px rgba(15, 28, 48, .045);
+}
+.sidebar-brand { border-bottom-color: rgba(226, 235, 248, .1) !important; }
+.app-nav-link {
+  border-radius: 12px !important;
+  margin-inline: 3px;
+  transition: background-color .16s ease, color .16s ease, transform .16s ease, box-shadow .16s ease;
+}
+.app-nav-link:hover { transform: translateX(2px); }
+.app-nav-link[aria-current="page"], .app-nav-link.active {
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.11), 0 6px 16px rgba(5, 13, 28, .14);
+}
+.app-main { background: var(--app-page-bg); }
+.app-main > div > header, .app-main > div > div.border-b.bg-white {
+  border-bottom-color: var(--app-border) !important;
+}
+.app-main .card {
+  border-color: var(--app-border);
+  border-radius: 17px;
+  box-shadow: var(--app-shadow);
+  transition: box-shadow .18s ease, border-color .18s ease, transform .18s ease;
+}
+.app-main .card:hover { border-color: #d6e1f0; }
+.app-main .label { color: #42536c; font-weight: 700; letter-spacing: -.01em; }
+.app-main .btn-primary, .app-main .btn-success, .app-main .btn-danger, .app-main .btn-secondary {
+  border-radius: 11px;
+  min-height: 39px;
+  font-weight: 750;
+  letter-spacing: -.012em;
+}
+.app-main input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+.app-main select, .app-main textarea, .app-main .input {
+  min-height: 41px;
+  border-radius: 11px;
+}
+.app-main .overflow-x-auto { overscroll-behavior-x: contain; }
+.app-main .overflow-y-auto { overscroll-behavior-y: contain; }
+.app-main table tbody tr:not(:last-child) td { border-bottom: 1px solid #edf1f7; }
+.app-main table tbody tr:focus-within { background: #eff6ff; }
+
+
+/* Silopi Dijital - ProPOS customer edition polish */
+.pc-sidebar {
+  background: linear-gradient(180deg, #101b32 0%, #142540 55%, #102b3d 100%);
+  box-shadow: 10px 0 30px rgba(15, 23, 42, 0.12);
+}
+.sidebar-brand {
+  border-color: rgba(148, 163, 184, 0.2) !important;
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.96), rgba(20, 42, 68, 0.88));
+}
+.app-sidebar-nav .app-nav-item {
+  border: 1px solid transparent;
+}
+.app-sidebar-nav .app-nav-item:hover {
+  border-color: rgba(148, 163, 184, 0.13);
+}
+.app-sidebar-nav .app-nav-item.is-active {
+  background: linear-gradient(110deg, #1677ff, #165ec3) !important;
+  box-shadow: 0 8px 18px rgba(22, 119, 255, 0.22);
+}
+.app-sidebar-nav .app-nav-child.is-active {
+  background: rgba(37, 99, 235, 0.18) !important;
+  color: #bfdbfe !important;
+}
+.card {
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.035);
+}
+.input:focus {
+  box-shadow: 0 0 0 3px rgba(22, 119, 255, 0.13);
+}
+.receipt-layout {
+  color: #111827;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+.receipt-layout .text-slate-500,
+.receipt-layout .text-slate-600 { color: #4b5563 !important; }
+
+/* Shared finishing touches for all non-print customer workspaces. */
+.app-main .card, .app-main section[class*="rounded-2xl"][class*="border"] { transition: border-color .16s ease, box-shadow .16s ease, transform .16s ease; }
+.app-main .card:hover { box-shadow: 0 7px 22px rgba(20, 42, 72, .07); }
+.app-main input::placeholder, .app-main textarea::placeholder { color: #9aa7b8; }
+.app-main .overflow-y-auto, .app-main .overflow-x-auto { scrollbar-color: #c6d2e2 transparent; }
+
+
